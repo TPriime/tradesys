@@ -30,19 +30,19 @@ public class TradeResourceTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void testTradeForBuy() throws Exception {
-
         mockMvc.perform(post("/api/trades/buy")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"asset\":\"BTC\", \"size\":1}"))
+                        .content("{\"asset\":\"BTC\", \"size\":1, \"userId\":1}"))
                 .andExpect(status().isCreated());
     }
 
     @Test
     void testTradeForSell() throws Exception {
-
         mockMvc.perform(post("/api/trades/sell")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"asset\":\"BTC\", \"size\":1}"))

@@ -16,6 +16,9 @@ public record User(
                 private Integer rank = Integer.MAX_VALUE;
                 private BigDecimal funds = new BigDecimal("100.00");
 
+                public Builder() {
+                }
+
                 public Builder(User user) {
                     this.id = user.id();
                     this.username = user.username();

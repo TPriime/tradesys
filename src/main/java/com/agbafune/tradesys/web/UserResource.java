@@ -21,16 +21,45 @@ public class UserResource {
     @Autowired
     private UserService userService;
 
-    @PostMapping()
-    public UserBean createUser(@RequestBody @Valid UserInputBean input) {
-        User model = userService.create(input.username());
-        return new UserBean(model);
-    }
+    @Autowired
+    private PortfolioService portfolioService;
 
     @GetMapping()
     public List<UserBean> getAllUsers() {
         return userService.getAllUsers().stream()
                 .map(UserBean::new)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping()
+    public ResponseEntity<Object> createUser(@RequestBody @Valid UserInputBean input) {
+        if(userService.findUserByUsername(input.username()).isPresent()) {
+            return new ResponseEntity<>(Map.of("error", "Username already exists"), HttpStatus.BAD_REQUEST);
+        }
+
+        User model = userService.create(input.username());
+        return ResponseEntity.of(Optional.of(new UserBean(model)));
+    }
+
+    @GetMapping("/{userId}")
+    public UserBean getUserById(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        return new UserBean(user);
+    }
+
+
+
+    @GetMapping("/{userId}/stats")
+    public UserStatsBean getUserStats(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        Portfolio portfolio = portfolioService.getPortfolioByUser(user.id());
+        return UserStatsBean.build(user, portfolio);
+    }
+
+    @GetMapping("/{userId}/leaderboard")
+    public UserStatsBean getLeaderboard(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        Portfolio portfolio = portfolioService.getPortfolioByUser(user.id());
+        return UserStatsBean.build(user, portfolio);
     }
 }

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface AssetRepository {
     Optional<Asset> findById(Long id);
-    Asset save(Asset asset);
     List<Asset> findAll();
+    Asset save(Asset asset);
 }

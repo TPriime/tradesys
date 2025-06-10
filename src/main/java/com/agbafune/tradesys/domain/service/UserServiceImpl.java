@@ -1,12 +1,15 @@
 package com.agbafune.tradesys.domain.service;
 
 
+import com.agbafune.tradesys.domain.exceptions.InsufficientFundsException;
+import com.agbafune.tradesys.domain.exceptions.UserNotFoundException;
 import com.agbafune.tradesys.domain.model.User;
 import com.agbafune.tradesys.domain.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,11 +21,45 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    @Override
     public User create(String username) {
         return userRepository.save(
                 new User(null, username, 0, Integer.MAX_VALUE, BigDecimal.valueOf(INITIAL_FUNDS)));
     }
 
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    @Override
+    public Optional<User> findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public void decreaseUserFunds(Long userId, BigDecimal amount) {
+        User user = getUserById(userId);
+        BigDecimal newFunds = user.funds().subtract(amount);
+        if (newFunds.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InsufficientFundsException("Insufficient funds for user ID: " + userId);
+        }
+        userRepository.save(new User.Builder(user)
+                .funds(newFunds)
+                .build());
+    }
+
+    @Override
+    public void increaseUserFunds(Long userId, BigDecimal amount) {
+        User user = getUserById(userId);
+        BigDecimal newFunds = user.funds().add(amount);
+        userRepository.save(new User.Builder(user)
+                .funds(newFunds)
+                .build());
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

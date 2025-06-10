@@ -1,23 +1,103 @@
 package com.agbafune.tradesys.domain.service;
 
+import com.agbafune.tradesys.domain.exceptions.InsufficientFundsException;
+import com.agbafune.tradesys.domain.model.Asset;
+import com.agbafune.tradesys.domain.model.Portfolio;
 import com.agbafune.tradesys.domain.model.TradeAction;
+import com.agbafune.tradesys.domain.model.TradeData;
+import com.agbafune.tradesys.domain.model.User;
+import com.agbafune.tradesys.domain.repository.TradeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Service
-public class TradeServiceImpl {
-    public void trade(String userId, String assetId, Double quantity, TradeAction action) {
-        if (action == TradeAction.BUY) {
-            // Logic for buying an asset
-            System.out.println("Buying " + quantity + " of asset " + assetId + " for user " + userId);
-        } else {
-            // Logic for selling an asset
-            System.out.println("Selling " + quantity + " of asset " + assetId + " for user " + userId);
+public class TradeServiceImpl implements TradeService {
+
+    private final AssetService assetService;
+    private final UserService userService;
+    private final PortfolioService portfolioService;
+    private final TradeRepository tradeRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(TradeServiceImpl.class);
+
+    public TradeServiceImpl(
+            AssetService assetService,
+            UserService userService,
+            PortfolioService portfolioService,
+            TradeRepository tradeRepository
+    ) {
+        this.assetService = assetService;
+        this.userService = userService;
+        this.portfolioService = portfolioService;
+        this.tradeRepository = tradeRepository;
+    }
+
+    public TradeData trade(Long userId, Long assetId, BigDecimal quantity, TradeAction action) {
+        Asset asset = assetService.getAsset(assetId);
+
+        switch (action) {
+            case BUY -> buy(userId, asset, quantity);
+            case SELL -> sell(userId, asset, quantity);
+            default -> throw new IllegalArgumentException("Invalid trade action: " + action);
+        }
+
+        return save(userId, quantity, action, asset);
+    }
+
+    private void buy(Long userId, Asset asset, BigDecimal quantity) {
+        BigDecimal assetPrice = asset.price().multiply(quantity);
+        logger.info("Buying {} of asset {} at price {} for user {}", quantity, asset.symbol(), assetPrice, userId);
+
+        UserLockManager.lockUser(userId);
+        try {
+            // check if user balance is enough
+            User user = userService.getUserById(userId);
+            if (user.funds().compareTo(assetPrice) < 0) {
+                throw new InsufficientFundsException();
+            }
+
+            // decrease user balance
+            userService.decreaseUserFunds(userId, assetPrice);
+
+            // add asset to user portfolio
+            Portfolio userPortfolio = portfolioService.getOrCreatePortfolioByUser(userId);
+            userPortfolio.addAsset(asset, quantity);
+            portfolioService.savePortfolio(userPortfolio);
+        } finally {
+            UserLockManager.unlockUser(userId);
         }
     }
 
-    public void buy(String userId, String assetId, Double quantity) {
-        // check if user balance is enough
-        // check if asset is available
+    private void sell(Long userId, Asset asset, BigDecimal quantity) {
+        BigDecimal assetPrice = asset.price().multiply(quantity);
+        logger.info("Selling {} of asset {} at price {} for user {}", quantity, asset.symbol(), assetPrice, userId);
 
+        // remove asset from user portfolio
+        Portfolio userPortfolio = portfolioService.getPortfolioByUser(userId);
+        userPortfolio.removeAsset(asset, quantity);
+        portfolioService.savePortfolio(userPortfolio);
+
+        // increase user balance
+        userService.increaseUserFunds(userId, assetPrice);
+    }
+
+    private TradeData save(Long userId, BigDecimal quantity, TradeAction action, Asset asset) {
+        return tradeRepository.save(
+                new TradeData.Builder()
+                        .userId(userId)
+                        .assetId(asset.id())
+                        .assetName(asset.name())
+                        .assetSymbol(asset.symbol())
+                        .assetPrice(asset.price())
+                        .action(action.name())
+                        .quantity(quantity)
+                        .total(asset.price().multiply(quantity))
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 }
