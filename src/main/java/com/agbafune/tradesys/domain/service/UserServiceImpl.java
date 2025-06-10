@@ -1,6 +1,7 @@
 package com.agbafune.tradesys.domain.service;
 
 
+import com.agbafune.tradesys.domain.exceptions.ConflictException;
 import com.agbafune.tradesys.domain.exceptions.InsufficientFundsException;
 import com.agbafune.tradesys.domain.exceptions.UserNotFoundException;
 import com.agbafune.tradesys.domain.model.User;
@@ -23,8 +24,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(String username) {
+        if(userRepository.findByUsername(username).isPresent()) {
+            throw new ConflictException("Username already exists: " + username);
+        }
         return userRepository.save(
-                new User(null, username, 0, Integer.MAX_VALUE, BigDecimal.valueOf(INITIAL_FUNDS)));
+                new User(null, username, 0, BigDecimal.valueOf(INITIAL_FUNDS)));
     }
 
     @Override
@@ -56,6 +60,15 @@ public class UserServiceImpl implements UserService {
         BigDecimal newFunds = user.funds().add(amount);
         userRepository.save(new User.Builder(user)
                 .funds(newFunds)
+                .build());
+    }
+
+    @Override
+    public User increaseUserGems(Long userId, Integer amount) {
+        User user = getUserById(userId);
+        Integer newGemCount = user.gemCount() + amount;
+        return userRepository.save(new User.Builder(user)
+                .gemCount(newGemCount)
                 .build());
     }
 

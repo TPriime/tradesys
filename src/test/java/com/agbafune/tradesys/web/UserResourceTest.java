@@ -1,4 +1,4 @@
-package com.agbafune.tradesys;
+package com.agbafune.tradesys.web;
 
 
 import com.agbafune.tradesys.domain.service.UserService;
@@ -30,12 +30,27 @@ public class UserResourceTest {
     void testCreateUser() throws Exception {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testUser\"}"))
-                .andExpect(status().isOk())
+                        .content("{\"username\":\"testUser245\"}"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.username").value("testUser"))
-                .andExpect(jsonPath("$.gemCount").value(0))
-                .andExpect(jsonPath("$.rank").isNumber());
+                .andExpect(jsonPath("$.username").value("testUser245"))
+                .andExpect(jsonPath("$.gemCount").value(0));
+    }
+
+
+    @Test
+    void testCreateUser_ShouldFailOnConflict() throws Exception {
+        // create user successfully
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"sameUserName\"}"))
+                .andExpect(status().isCreated());
+
+        // attempt to create the same user
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"sameUserName\"}"))
+                .andExpect(status().isConflict());
     }
 
     @Test

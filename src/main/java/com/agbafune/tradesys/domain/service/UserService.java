@@ -18,5 +18,7 @@ public interface UserService {
 
     void increaseUserFunds(Long userId, BigDecimal amount);
 
+    User increaseUserGems(Long userId, Integer amount);
+
     List<User> getAllUsers();
 }

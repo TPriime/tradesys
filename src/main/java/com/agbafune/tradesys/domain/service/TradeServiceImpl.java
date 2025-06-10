@@ -7,6 +7,7 @@ import com.agbafune.tradesys.domain.model.TradeAction;
 import com.agbafune.tradesys.domain.model.TradeData;
 import com.agbafune.tradesys.domain.model.User;
 import com.agbafune.tradesys.domain.repository.TradeRepository;
+import com.agbafune.tradesys.infra.EventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class TradeServiceImpl implements TradeService {
     private final UserService userService;
     private final PortfolioService portfolioService;
     private final TradeRepository tradeRepository;
+    private final EventPublisher eventPublisher;
 
     private final Logger logger = LoggerFactory.getLogger(TradeServiceImpl.class);
 
@@ -28,12 +30,14 @@ public class TradeServiceImpl implements TradeService {
             AssetService assetService,
             UserService userService,
             PortfolioService portfolioService,
-            TradeRepository tradeRepository
+            TradeRepository tradeRepository,
+            EventPublisher eventPublisher
     ) {
         this.assetService = assetService;
         this.userService = userService;
         this.portfolioService = portfolioService;
         this.tradeRepository = tradeRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public TradeData trade(Long userId, Long assetId, BigDecimal quantity, TradeAction action) {
@@ -45,7 +49,10 @@ public class TradeServiceImpl implements TradeService {
             default -> throw new IllegalArgumentException("Invalid trade action: " + action);
         }
 
-        return save(userId, quantity, action, asset);
+        TradeData trade = save(userId, quantity, action, asset);
+        eventPublisher.publishTradeEvent(userId, trade.id());
+
+        return trade;
     }
 
     private void buy(Long userId, Asset asset, BigDecimal quantity) {

@@ -1,6 +1,8 @@
-package com.agbafune.tradesys.web;
+package com.agbafune.tradesys.web.exception;
 
 import com.agbafune.tradesys.domain.exceptions.AssetNotFoundException;
+import com.agbafune.tradesys.domain.exceptions.ConflictException;
+import com.agbafune.tradesys.domain.exceptions.InsufficientAssetsException;
 import com.agbafune.tradesys.domain.exceptions.InsufficientFundsException;
 import com.agbafune.tradesys.domain.exceptions.PortfolioNotFoundException;
 import com.agbafune.tradesys.domain.exceptions.UserNotFoundException;
@@ -32,5 +34,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleInsufficientAsset(InsufficientAssetsException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ErrorResponse("An unexpected error occurred: " + ex.getMessage()));
     }
 }

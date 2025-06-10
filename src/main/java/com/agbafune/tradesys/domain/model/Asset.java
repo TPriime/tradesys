@@ -1,18 +1,21 @@
 package com.agbafune.tradesys.domain.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public record Asset(
         Long id,
         String name,
         String symbol,
-        BigDecimal price
+        BigDecimal price,
+        LocalDateTime lastUpdated
 ) {
     public static class Builder {
         private Long assetId;
         private String name;
         private String symbol;
         private BigDecimal price;
+        private LocalDateTime lastUpdated;
 
         public Builder() { }
 
@@ -21,6 +24,8 @@ public record Asset(
             this.name = asset.name();
             this.symbol = asset.symbol();
             this.price = asset.price();
+            this.lastUpdated = asset.lastUpdated() == null ?
+                    LocalDateTime.now() : asset.lastUpdated();
         }
 
         public Builder id(Long assetId) {
@@ -43,8 +48,13 @@ public record Asset(
             return this;
         }
 
+        public Builder lastUpdated(LocalDateTime lastUpdated) {
+            this.lastUpdated = lastUpdated;
+            return this;
+        }
+
         public Asset build() {
-            return new Asset(assetId, name, symbol, price);
+            return new Asset(assetId, name, symbol, price, lastUpdated);
         }
     }
 }

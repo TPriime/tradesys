@@ -22,7 +22,7 @@ public record UserStatsBean(
             BigDecimal quantity
     ){}
 
-    public static UserStatsBean build(User user, Portfolio portfolio) {
+    public static UserStatsBean build(User user, Portfolio portfolio, Integer rank) {
         List<AssetBean> assetList = portfolio.assets().stream()
                 .map(asset -> new AssetBean(
                         asset.getAsset().id(),
@@ -33,6 +33,6 @@ public record UserStatsBean(
                 ))
                 .toList();
 
-        return new UserStatsBean(user.id(), user.gemCount(), user.rank(), user.funds(), assetList, portfolio.value());
+        return new UserStatsBean(user.id(), user.gemCount(), rank, user.funds(), assetList, portfolio.value());
     }
 }
