@@ -2,7 +2,7 @@
 
 The system should simulate a gamified trading feature for an investment app and allow users to:
 1. Create portfolios and add assets.
-2. Simulate trading of assets (buy/sell).
+2. Simulate trading of assets (buy/sell), every 10s.
 3. Earn gems based on trading activities.
 4. Introduce a ranking system that tracks users with the highest gem count.
 
@@ -31,10 +31,17 @@ git clone https://github.com/TPriime/tradesys.git
 cd tradesys
 
 # Run the application
-./gradlew bootRun
+./gradlew src:infrastructure:bootRun
 ```
 The application should now be available at:
 http://localhost:8080
+
+Asset simulation rate can be updated by setting the env variable `SIMULATION_ASSET_CHANGE_SECS`.
+For example the following would make asset values to change every 10 seconds (default):
+```
+export SIMULATION_ASSET_CHANGE_SECS=10
+./gradlew src:infrastructure:bootRun
+```
 
 ### 📌 **API Endpoints**
 | Method | Endpoint                      | Description             |
