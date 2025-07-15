@@ -1,9 +1,7 @@
 package com.agbafune.tradesys.repository;
 
 import com.agbafune.tradesys.model.Asset;
-import org.springframework.stereotype.Service;
 
-@Service
 public class AssetRepositoryImpl extends BaseInmemRepository<Asset> implements AssetRepository {
 
     @Override

@@ -73,7 +73,7 @@ public class UserRankManager implements UserRankAccessor {
                 int gem = entry.getKey();
                 int count = entry.getValue().intValue();
 
-                // Get all users with the current gem value
+                // Get all users with the current gem value (they would all share the same rank )
                 List<Long> usersWithGem = userGemValue.entrySet().stream()
                         .filter(e -> e.getValue().equals(gem))
                         .map(Map.Entry::getKey)

@@ -1,11 +1,9 @@
 package com.agbafune.tradesys.repository;
 
 import com.agbafune.tradesys.model.User;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
 public class UserRepositoryImpl extends BaseInmemRepository<User> implements UserRepository {
 
     @Override

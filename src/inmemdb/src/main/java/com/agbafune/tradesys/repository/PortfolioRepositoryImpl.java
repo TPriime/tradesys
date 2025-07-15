@@ -1,11 +1,9 @@
 package com.agbafune.tradesys.repository;
 
 import com.agbafune.tradesys.model.Portfolio;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
 public class PortfolioRepositoryImpl extends BaseInmemRepository<Portfolio> implements PortfolioRepository {
     @Override
     public Optional<Portfolio> findByUserId(Long userId) {

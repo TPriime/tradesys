@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
 	implementation project(":src:domain")
+	implementation project(":src:inmemdb")
 
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'

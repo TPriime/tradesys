@@ -88,14 +88,14 @@ This project follows the Hexagonal architecture design style. Hexagonal Architec
 .
 └── src
     ├─── domain
-    |   └── src/main/java/com/agbafune/tradesys
-    |       ├── api
-    |       ├── event
-    |       ├── exception
-    |       ├── model
-    |       ├── repository
-    |       └── simulator
-    └── infrastructure
+    │   └── src/main/java/com/agbafune/tradesys
+    │       ├── api
+    │       ├── event
+    │       ├── exception
+    │       ├── model
+    │       ├── repository
+    │       └── simulator
+    └── spring
         └── src/main/java/com/agbafune/tradesys
             ├── event
             ├── repository
@@ -108,9 +108,9 @@ This project follows the Hexagonal architecture design style. Hexagonal Architec
     - [**model**](./src/domain/src/main/java/com/agbafune/tradesys/model/) defines the domain models.
     - [**repository**](./src/domain/src/main/java/com/agbafune/tradesys/repository/) defines repositories as *inbound ports*. The infrastruce implements these interfaces to provide a datastore for the application.
     - [**simulator**](./src/domain/src/main/java/com/agbafune/tradesys/simulator/) contains an [`AssetSimulator`](./src/domain/src/main/java/com/agbafune/tradesys/simulator/AssetSimulator.java) that simulates live changes in asset prices. It updates the prices of all assets in the system.
-- [**infrastructure**](./src/infrastructure/) is based on [Spring boot](https://spring.io/projects/spring-boot/). It contains the infrastructure code — defines the actual respositories and provides a web interface for interacting with the system. 
+- [**spring**](./src/spring/) is implementation of the infrastructure based on [Spring boot](https://spring.io/projects/spring-boot/). It contains the infrastructure code — defines the actual respositories and provides a web interface for interacting with the system. 
    - [**event**](./src/infrastructure/src/main/java/com/agbafune/tradesys/event/) defines *adapters* which are concrete implementations of the event *ports* in the core.
-   - [**repository**](./src/infrastructure/src/main/java/com/agbafune/tradesys/repository/) defines *adapters* which are concrete implementations of the repository *ports* in the core. In this case — an in-memory database.
+   - [**repository**](./src/infrastructure/src/main/java/com/agbafune/tradesys/repository/) defines *adapters* which are concrete implementations of the repository *ports* in the core. In this case — an in-memory database. (Moved to [inmemdb](./src/inmemdb/))
    - [**web**](./src/infrastructure/src/main/java/com/agbafune/tradesys/web/) provides a spring based web interface, APIs for interacting with the system.
 
 ---

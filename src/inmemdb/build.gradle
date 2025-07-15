@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.agbafune'
+version = '0.0.1-SNAPSHOT'
+
+ext {
+    vertxVersion = '5.0.1'
+    junitJupiterVersion = '5.9.1'
+    mainVerticleName = 'com.agbafune.tradesys.MainVerticle'
+    launcherClassName = 'io.vertx.launcher.application.VertxApplication'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(24)
+	}
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':src:domain')
+}

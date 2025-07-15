@@ -1,4 +1,6 @@
 rootProject.name = 'tradesys'
 
 include 'src:domain'
-include 'src:infrastructure'
+include 'src:inmemdb'
+include 'src:spring'
+include 'src:vertx'

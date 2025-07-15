@@ -1,0 +1,79 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.agbafune'
+version = '0.0.1-SNAPSHOT'
+
+ext {
+    vertxVersion = '5.0.1'
+    junitJupiterVersion = '5.9.1'
+    mainVerticleName = 'com.agbafune.tradesys.MainVerticle'
+    launcherClassName = 'io.vertx.launcher.application.VertxApplication'
+}
+
+application {
+    mainClass = launcherClassName
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(24)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':src:domain')
+    implementation project(':src:inmemdb')
+
+    implementation platform("io.vertx:vertx-stack-depchain:$vertxVersion")
+    implementation "io.vertx:vertx-core:$vertxVersion"
+    implementation "io.vertx:vertx-web:$vertxVersion"
+    implementation "io.vertx:vertx-launcher-application:$vertxVersion"
+    implementation "org.slf4j:slf4j-api:2.0.17"
+    implementation 'ch.qos.logback:logback-classic:1.5.13'
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.19.1"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1"
+
+    testImplementation "io.vertx:vertx-junit5:$vertxVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitJupiterVersion"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    testLogging {
+        events = [TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED]
+    }
+}
+
+tasks.withType(ShadowJar).configureEach {
+    archiveClassifier.set('fat')
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles()
+}
+
+tasks.withType(JavaExec).configureEach {
+    args = [mainVerticleName]
+}
+
+//run {
+//    args = [
+//        'run', mainVerticleName,
+//        '--java-opts', '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+//    ]
+//}
