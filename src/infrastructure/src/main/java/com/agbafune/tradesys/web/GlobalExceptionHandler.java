@@ -1,4 +1,4 @@
-package com.agbafune.tradesys.web.exception;
+package com.agbafune.tradesys.web;
 
 import com.agbafune.tradesys.exception.ConflictException;
 import com.agbafune.tradesys.exception.InsufficientAssetsException;

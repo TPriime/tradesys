@@ -1,6 +1,6 @@
 package com.agbafune.tradesys.event;
 
-public record UserRewardEvent(
+public record UserRewardedEvent(
     Long userId,
     Integer awardedGems,
     Integer userGems

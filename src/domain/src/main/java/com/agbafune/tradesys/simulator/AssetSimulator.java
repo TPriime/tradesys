@@ -5,7 +5,6 @@ import com.agbafune.tradesys.model.Asset;
 import com.agbafune.tradesys.repository.AssetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -14,14 +13,16 @@ import java.time.LocalDateTime;
 
 @Component
 public class AssetSimulator implements AssetChangeSimulator {
-    @Autowired
-    private AssetRepository assetRepository;
-
+    private final AssetRepository assetRepository;
     private final Logger logger = LoggerFactory.getLogger(AssetSimulator.class);
+
+    public AssetSimulator (AssetRepository assetRepository) {
+        this.assetRepository = assetRepository;
+    }
 
     @Override
     public void updateAssetPrices() {
-        logger.info("Updating asset prices...");
+        logger.debug("Updating asset prices...");
 
         assetRepository.findAll().forEach(
             asset -> {

@@ -1,12 +1,16 @@
 package tradesys;
 
 import com.agbafune.tradesys.UserRankManager;
+import com.agbafune.tradesys.event.AppEventListener;
+import com.agbafune.tradesys.event.TradeEvent;
+import com.agbafune.tradesys.event.UserRewardedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,9 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UserRankManagerTest {
     private UserRankManager systemUserRankManager;
 
+    private AppEventListener mockEventListener = new AppEventListener() {
+        @Override
+        public void onTradeEvent(Consumer<TradeEvent> handler) {}
+        @Override
+        public void onUserRewardedEvent(Consumer<UserRewardedEvent> handler) {}
+    };
+
     @BeforeEach
     void setUp() {
-        systemUserRankManager = new UserRankManager();
+        systemUserRankManager = new UserRankManager(mockEventListener);
     }
 
     @Test

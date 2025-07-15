@@ -3,7 +3,7 @@ package com.agbafune.tradesys.event;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface EventPublisher {
+public interface AppEventPublisher {
 
     public void publishTradeEvent(Long userId, Long tradeId);
 

@@ -2,10 +2,8 @@ package com.agbafune.tradesys;
 
 import com.agbafune.tradesys.api.AssetChangeSimulator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -22,6 +20,7 @@ public class TradesysApplication {
 		SpringApplication.run(TradesysApplication.class, args);
 	}
 
+	// simulate asset price changes
 	@Scheduled(fixedRateString = "${simulation.asset-change-secs}", timeUnit = TimeUnit.SECONDS)
 	public void updateAssets() {
 		assetChangeSimulator.updateAssetPrices();

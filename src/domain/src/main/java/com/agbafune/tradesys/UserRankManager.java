@@ -1,6 +1,8 @@
 package com.agbafune.tradesys;
 
 import com.agbafune.tradesys.api.UserRankAccessor;
+import com.agbafune.tradesys.event.AppEventListener;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -17,6 +19,12 @@ public class UserRankManager implements UserRankAccessor {
     private final ConcurrentHashMap<Long, Integer> userGemValue = new ConcurrentHashMap<>();
     private final ConcurrentSkipListMap<Integer, LongAdder> gemValueCounts = new ConcurrentSkipListMap<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public UserRankManager(AppEventListener eventListener) {
+        eventListener.onUserRewardedEvent(event -> {
+            updateRank(event.userId(), event.userGems());
+        });
+    }
 
     public void updateRank(Long userId, Integer newGemValue) {
         lock.writeLock().lock();

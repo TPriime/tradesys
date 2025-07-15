@@ -1,7 +1,9 @@
 package com.agbafune.tradesys;
 
-import com.agbafune.tradesys.event.EventPublisher;
+import com.agbafune.tradesys.event.AppEventPublisher;
+import com.agbafune.tradesys.event.AppEventListener;
 import com.agbafune.tradesys.model.User;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -11,19 +13,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SystemRewarder {
 
     private final UserService userService;
-    private final EventPublisher eventPublisher;
+    private final AppEventPublisher eventPublisher;
 
     private final Map<Long, Integer> userTrades = new ConcurrentHashMap<>();
     private Long lastTraderId = -1L;
     private int tradeStreak = 0;
 
 
-    public SystemRewarder(UserService userService, EventPublisher eventPublisher) {
+    public SystemRewarder(UserService userService, AppEventPublisher eventPublisher, AppEventListener eventListener) {
         this.userService = userService;
         this.eventPublisher = eventPublisher;
+
+        eventListener.onTradeEvent(event -> {
+            rewardForTrade(event.userId(), event.assetId());
+        });
     }
 
-    public void rewardForTrade(Long userId, Long tradeId) {
+    public void rewardForTrade(Long userId, Long assetId) {
         int rewardPoints = 1; // Default reward points per trade
         rewardPoints += calculateMileStoneBonus(userId);
         rewardPoints += calculateStreakBonus(userId);
@@ -36,8 +42,8 @@ public class SystemRewarder {
         int tradeCount = increaseAndGetTradeCount(userId);
 
         return switch (tradeCount) {
-            case 5 ->  5; // Bonus for a milestone of 5 trades
-            case 10 ->  10; // Bonus for a milestone of 10 trades
+            case 5 -> 5; // Bonus for a milestone of 5 trades
+            case 10 -> 10; // Bonus for a milestone of 10 trades
             // Bonus for any milestone in series of twenty, or no bonus
             default -> tradeStreak % 20 == 0 ? tradeStreak : 0;
         };
@@ -64,7 +70,7 @@ public class SystemRewarder {
         };
     }
 
-    public void reset(){
+    public void reset() {
         userTrades.clear();
         lastTraderId = -1L;
         tradeStreak = 0;

@@ -1,7 +1,7 @@
 package com.agbafune.tradesys;
 
 import com.agbafune.tradesys.exception.InsufficientFundsException;
-import com.agbafune.tradesys.event.EventPublisher;
+import com.agbafune.tradesys.event.AppEventPublisher;
 import com.agbafune.tradesys.model.Asset;
 import com.agbafune.tradesys.model.Portfolio;
 import com.agbafune.tradesys.model.TradeAction;
@@ -24,7 +24,7 @@ public class SystemTraderImpl implements SystemTrader {
     private final UserService userService;
     private final PortfolioManager portfolioManager;
     private final TradeRepository tradeRepository;
-    private final EventPublisher eventPublisher;
+    private final AppEventPublisher eventPublisher;
 
     private final Logger logger = LoggerFactory.getLogger(SystemTraderImpl.class);
 
@@ -33,7 +33,7 @@ public class SystemTraderImpl implements SystemTrader {
             UserService userService,
             PortfolioManager portfolioManager,
             TradeRepository tradeRepository,
-            EventPublisher eventPublisher
+            AppEventPublisher eventPublisher
     ) {
         this.assetRepository = assetRepository;
         this.userService = userService;

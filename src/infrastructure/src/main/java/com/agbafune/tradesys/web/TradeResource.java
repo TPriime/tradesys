@@ -34,14 +34,9 @@ public class TradeResource {
 
     @GetMapping()
     public List<TradeDataBean> getAllTrades(@RequestParam(required = false) Long userId) {
-        List<TradeData> trades;
-
-        if (userId != null) {
-            trades = tradeRepository.findByUserId(userId);
-        } else {
-            trades = tradeRepository.findAll();
-        }
-
+        List<TradeData> trades = userId != null
+            ? tradeRepository.findByUserId(userId)
+            : tradeRepository.findAll();
         return trades.stream().map(TradeDataBean::new).toList();
     }
 
