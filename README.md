@@ -115,9 +115,11 @@ This project follows the Hexagonal architecture design style. Hexagonal Architec
 
 ---
 
-### 🏅 Ranking Logic
+### Architecture
 
-<img src="./tradesys-ranking-system.svg" alt="Diagram" width="500" height="400" />
+<img src="./tradesys-ranking-system.svg" alt="System Architecture" width="100%" height="auto" />
+
+### Ranking Logic
 
 #### 🏅 UserRankManager
 
